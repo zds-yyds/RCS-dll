@@ -34,7 +34,11 @@ struct FOV {
 
 class HYSimulation_API Signature {
 public:
-
+	Signature(RCSCache path)
+		: cache(path)
+	{
+	}
+	
 	double GetRCS(POSITION Pos, double maxRange/*km*/, double minAz, double maxAz, double minEle, double maxEle, double freq, polarization pol, std::string platformName, POSITION myPos);
 
 	double GetRCS(POSITION Pos, double freq, polarization pol, std::string platformName, POSITION myPos);

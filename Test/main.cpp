@@ -24,7 +24,8 @@ int main() {
 #endif
 
 #if 1
-	Signature sig;
+	RCSCache path;
+	Signature sig(path);
 	if (!sig.loadFromDB("localhost", "root", "123456", "test_rcs")) {
 		return 1;
 	}
