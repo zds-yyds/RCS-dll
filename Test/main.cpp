@@ -25,11 +25,11 @@ int main() {
 
 #if 1
 	Signature sig;
-	if (!sig.cache.loadFromDB("localhost", "root", "123456", "test_rcs")) {
+	if (!sig.loadFromDB("localhost", "root", "123456", "test_rcs")) {
 		return 1;
 	}
 	else {
-		auto f16_records = sig.cache.findByAircraft("F-16");
+		auto f16_records = sig.findByAircraft("F-16");
 		std::cout << "F-16一共: " << f16_records.size() << "个 \n" << std::endl;
 	}
 

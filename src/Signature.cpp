@@ -1,25 +1,7 @@
 #include "Signature.h"
 #include <cmath>
-// C 风格导出函数的实现
-extern "C" {
 
-	HYSimulation_API bool loadFromDB(const char* host, const char* user,
-		const char* password, const char* database) {
-		static HY::Signature sig;  // 使用静态实例
-		return sig.cache.loadFromDB(host, user, password, database);
-	}
-
-	HYSimulation_API void* createSignature() {
-		return new HY::Signature();
-	}
-
-	HYSimulation_API void destroySignature(void* signature) {
-		if (signature) {
-			delete static_cast<HY::Signature*>(signature);
-		}
-	}
-}
-double HY::Signature::GetRCS(POSITION Pos, double maxRange/*km*/, double minAz, double maxAz, double minEle, double maxEle, double freq, polarization pol, std::string platformName, POSITION myPos)
+double Signature::GetRCS(POSITION Pos, double maxRange/*km*/, double minAz, double maxAz, double minEle, double maxEle, double freq, polarization pol, std::string platformName, POSITION myPos)
 {
 	/*判断是否进入探测方视场*/
 	const GeoCoord GeoPos = { Pos.lat,Pos.lon,Pos.alt};
@@ -33,7 +15,7 @@ double HY::Signature::GetRCS(POSITION Pos, double maxRange/*km*/, double minAz, 
 	return 0;
 }
 
-void HY::Signature::RelativeAzEl(const GeoCoord& observer, const GeoCoord& target, double heading_deg, double pitch_deg, double& relAz_deg, double& relEl_deg)
+void Signature::RelativeAzEl(const GeoCoord& observer, const GeoCoord& target, double heading_deg, double pitch_deg, double& relAz_deg, double& relEl_deg)
 {
 	// 1. 转换到 ECEF
 	double ox, oy, oz;
@@ -128,7 +110,7 @@ inline int findTemperatureIndex(double temperature) {
 	return -1;
 }
 
-double HY::Signature::findRCS(std::vector<RCSRecord>& records, const std::string& name, double frequency, const std::string& polarization, double azimuth, double elevation)
+double Signature::findRCS(std::vector<RCSRecord>& records, const std::string& name, double frequency, const std::string& polarization, double azimuth, double elevation)
 {
 	for (RCSRecord rec : records) {
 		
@@ -144,7 +126,7 @@ double HY::Signature::findRCS(std::vector<RCSRecord>& records, const std::string
 	return 0;
 }
 
-double HY::Signature::findIR(std::vector<IRRecord>& records, const std::string & name, const std::string & thrust_state, int env_temperature, double azimuth, double elevation)
+double Signature::findIR(std::vector<IRRecord>& records, const std::string & name, const std::string & thrust_state, int env_temperature, double azimuth, double elevation)
 {
 	for (IRRecord rec : records) {
 		
@@ -160,7 +142,22 @@ double HY::Signature::findIR(std::vector<IRRecord>& records, const std::string &
 	return 0.0;
 }
 
-double HY::Signature::GetRCS(POSITION Pos, double freq, polarization pol, std::string platformName, POSITION myPos)
+bool Signature::loadFromDB(const std::string & host, const std::string & user, const std::string & password, const std::string & database)
+{
+	// 检查每个参数的地址和内容
+	std::cout << "host: " << (void*)host.c_str() << ", is: " << host << std::endl;
+	std::cout << "user: " << (void*)user.c_str() << ", is: " << user << std::endl;
+	std::cout << "db: " << (void*)database.c_str() << ", is: " << database << std::endl;
+	std::cout << "password leng: " << password.length() << std::endl;
+	return cache.loadFromDB(host, user, password, database);
+}
+
+std::vector<HY::RCSRecord> Signature::findByAircraft(const std::string & name)
+{
+	return cache.findByAircraft(name);
+}
+
+double Signature::GetRCS(POSITION Pos, double freq, polarization pol, std::string platformName, POSITION myPos)
 {
 	const GeoCoord GeoPos = { Pos.lat,Pos.lon,Pos.alt };
 	const GeoCoord myGeoPos = { myPos.lat,myPos.lon,myPos.alt };
@@ -196,7 +193,7 @@ double HY::Signature::GetRCS(POSITION Pos, double freq, polarization pol, std::s
 	return 0;
 }
 
-double HY::Signature::GetIR(POSITION Pos, double temperature, thrustState thrust, std::string platformName, POSITION myPos)
+double Signature::GetIR(POSITION Pos, double temperature, thrustState thrust, std::string platformName, POSITION myPos)
 {
 	const GeoCoord GeoPos = { Pos.lat,Pos.lon,Pos.alt };
 	const GeoCoord myGeoPos = { myPos.lat,myPos.lon,myPos.alt };
@@ -231,7 +228,7 @@ double HY::Signature::GetIR(POSITION Pos, double temperature, thrustState thrust
 	return 0.0;
 }
 
-std::vector<HY::ESMRecord> HY::Signature::GetESM(POSITION Pos, std::string platformName, POSITION myPos)
+std::vector<HY::ESMRecord> Signature::GetESM(POSITION Pos, std::string platformName, POSITION myPos)
 {
 	std::vector<HY::ESMRecord> esm;
 	if (cache.name_index_esm.find(platformName) != cache.name_index_esm.end()) {
@@ -268,7 +265,7 @@ std::vector<HY::ESMRecord> HY::Signature::GetESM(POSITION Pos, std::string platf
 	return std::vector<ESMRecord>();
 }
 
-std::vector<HY::ECMRecord> HY::Signature::GetECM(POSITION Pos, std::string platformName, POSITION myPos)
+std::vector<HY::ECMRecord> Signature::GetECM(POSITION Pos, std::string platformName, POSITION myPos)
 {
 	std::vector<HY::ECMRecord> ecm;
 	if (cache.name_index_ecm.find(platformName) != cache.name_index_ecm.end()) {
