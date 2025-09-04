@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include "DBCache.h"
+#include "license.h"
 
 using namespace HY;
 

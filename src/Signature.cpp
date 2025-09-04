@@ -1,5 +1,7 @@
 #include "Signature.h"
 #include <cmath>
+#include <filesystem>
+
 
 double Signature::GetRCS(POSITION Pos, double maxRange/*km*/, double minAz, double maxAz, double minEle, double maxEle, double freq, polarization pol, std::string platformName, POSITION myPos)
 {
@@ -145,11 +147,32 @@ double Signature::findIR(std::vector<IRRecord>& records, const std::string & nam
 bool Signature::loadFromDB(const std::string & host, const std::string & user, const std::string & password, const std::string & database)
 {
 	// 检查每个参数的地址和内容
-	std::cout << "host: " << (void*)host.c_str() << ", is: " << host << std::endl;
+	/*std::cout << "host: " << (void*)host.c_str() << ", is: " << host << std::endl;
 	std::cout << "user: " << (void*)user.c_str() << ", is: " << user << std::endl;
 	std::cout << "db: " << (void*)database.c_str() << ", is: " << database << std::endl;
-	std::cout << "password leng: " << password.length() << std::endl;
-	return cache.loadFromDB(host, user, password, database);
+	std::cout << "password leng: " << password.length() << std::endl;*/
+	try {
+		
+		License license("license.txt");
+		if (!license.isValid()) {
+			std::cerr << "License invalid or expired!" << std::endl;
+			return false;
+		}
+		std::cout << "Licensed to: " << license.getOwner() << std::endl;
+		std::time_t t = license.getExpiry();  // 左值
+		std::cout << "License valid until: "
+			<< std::asctime(std::localtime(&t))
+			<< std::endl;
+
+		// 继续运行主逻辑
+		return cache.loadFromDB(host, user, password, database);
+
+	}
+	catch (const std::exception& ex) {
+		std::cerr << "License check failed: " << ex.what() << std::endl;
+		return false;
+	}
+	
 }
 
 std::vector<HY::RCSRecord> Signature::findByAircraft(const std::string & name)

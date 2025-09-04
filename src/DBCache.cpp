@@ -14,10 +14,10 @@ bool HY::RCSCache::loadFromDB(const std::string & host, const std::string & user
 	MYSQL_ROW row_ecm;
 
 	// 检查每个参数的地址和内容
-	std::cout << "host: " << (void*)host.c_str() << ", is: " << host << std::endl;
+	/*std::cout << "host: " << (void*)host.c_str() << ", is: " << host << std::endl;
 	std::cout << "user: " << (void*)user.c_str() << ", is: " << user << std::endl;
 	std::cout << "db: " << (void*)database.c_str() << ", is: " << database << std::endl;
-	std::cout << "password leng: " << password.length() << std::endl;
+	std::cout << "password leng: " << password.length() << std::endl;*/
 
 	// 初始化
 	conn = mysql_init(nullptr);
